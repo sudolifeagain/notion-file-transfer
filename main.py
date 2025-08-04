@@ -9,19 +9,19 @@ import download # 既存スクリプトをインポート
 CONFIG_FILE = "config.json"
 
 def load_config():
-    """設定ファイルを読み込む。なければデフォルト値を返す。"""
+    """設定ファイルを読み込む。なければデフォルト値を返す."""
     if os.path.exists(CONFIG_FILE):
         with open(CONFIG_FILE, 'r', encoding='utf-8') as f:
             return json.load(f)
     return {} # 初回起動時は空
 
 def save_config(values):
-    """GUIの入力値を設定ファイルに保存する。"""
+    """GUIの入力値を設定ファイルに保存する."""
     with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
         json.dump(values, f, indent=4, ensure_ascii=False)
 
 def run_task(target_func, window):
-    """GUIが固まらないように、別スレッドで処理を実行する。"""
+    """GUIが固まらないように、別スレッドで処理を実行する."""
     config = load_config()
     if not config.get("NOTION_TOKEN") or not config.get("DATABASE_ID"):
         print("エラー: Notion TokenとDatabase IDは必須です。")
@@ -40,7 +40,7 @@ def run_task(target_func, window):
         window['DOWNLOAD'].update(disabled=False)
 
 def main():
-    sg.theme("SystemDefault")
+    sg.theme_global("SystemDefault")
     config = load_config()
 
     # --- GUIのレイアウト定義 ---
