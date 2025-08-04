@@ -44,6 +44,10 @@ jobs:
           pyinstaller --onefile --windowed `
             --name "Notion-File-Transfer" `
             --clean --noupx `
+            --hidden-import PySimpleGUI `
+            --hidden-import tkinter `
+            --hidden-import tkinter.ttk `
+            --collect-all PySimpleGUI `
             main.py
 
       # 6. リリース作成 & EXE添付
