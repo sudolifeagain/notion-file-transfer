@@ -1,0 +1,5 @@
+pysimplegui
+requests
+python-dotenv
+tqdm
+pyinstaller
