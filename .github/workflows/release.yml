@@ -32,11 +32,11 @@ jobs:
           cd ..
           pip install .
 
-      # 4. 不要ファイルの削除（誤検知対策）
+      # 4. 古いビルド成果物の削除（PowerShellコマンド）
       - name: Clean old build artifacts
         run: |
-          rmdir /S /Q build dist 2>nul || echo "No old build/dist"
-          del /F /Q *.spec 2>nul || echo "No old spec"
+          Remove-Item -Recurse -Force build, dist -ErrorAction SilentlyContinue
+          Remove-Item -Force *.spec -ErrorAction SilentlyContinue
 
       # 5. EXEビルド（クリーン・UPX無効・独自アイコン）
       - name: Build executable
