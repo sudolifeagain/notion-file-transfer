@@ -36,11 +36,13 @@ jobs:
 
       # 4. PyInstallerで.exeファイルをビルド（クリーン・UPX無効化）
       - name: Build executable
-        run: pyinstaller --onefile --windowed --name "Notion-File-Transfer" main.py
+        # --noupx オプションを追加して、UPX圧縮による誤検知を回避します。
+        run: pyinstaller --onefile --windowed --name "Notion-File-Transfer" main.py --noupx
 
       # 5. リリースを更新し、EXEファイルとノートを添付
       - name: Update Release with EXE and Notes
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
+          # ビルドされたファイル名に合わせています。
           files: ./dist/Notion-File-Transfer.exe
