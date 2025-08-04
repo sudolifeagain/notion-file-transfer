@@ -44,7 +44,7 @@ jobs:
           pyinstaller --onefile --windowed `
             --name "Notion-File-Transfer" `
             --clean --noupx `
-            --hidden-import PySimpleGUI `
+            --hidden-import FreeSimpleGUI `
             --hidden-import tkinter `
             --hidden-import tkinter.ttk `
             --hidden-import requests `
@@ -59,7 +59,7 @@ jobs:
             --hidden-import re `
             --hidden-import collections `
             --hidden-import tqdm `
-            --collect-all PySimpleGUI `
+            --collect-all FreeSimpleGUI `
             --collect-all tkinter `
             --collect-all requests `
             --collect-all tqdm `

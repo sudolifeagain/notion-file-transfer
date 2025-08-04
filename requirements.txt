@@ -1,4 +1,4 @@
-pysimplegui==4.60.5
+FreeSimpleGUI
 requests
 python-dotenv
 tqdm
