@@ -40,7 +40,15 @@ def run_task(target_func, window):
         window['DOWNLOAD'].update(disabled=False)
 
 def main():
-    sg.theme_global("SystemDefault")
+    # テーマ設定を互換性のある方法で行う
+    try:
+        sg.theme("SystemDefault")
+    except:
+        try:
+            sg.theme_global("SystemDefault")
+        except:
+            pass  # テーマ設定に失敗した場合はデフォルトを使用
+    
     config = load_config()
 
     # --- GUIのレイアウト定義 ---
