@@ -8,6 +8,44 @@ import download # 既存スクリプトをインポート
 
 CONFIG_FILE = "config.json"
 
+# --- stdout/stderrをGUIにリダイレクトするためのカスタムクラス ---
+class GuiOutputStream:
+    """
+    print()の出力をGUIのMultiline要素にリダイレクトする。
+    tqdmの進捗バーが1行で更新されるように、行頭復帰文字(\r)を処理する。
+    """
+    def __init__(self, multiline_element):
+        self.multiline = multiline_element
+        self.is_tqdm_line = False
+
+    def write(self, text):
+        # tqdmは行の更新に '\r' を使う
+        is_progress_bar = text.endswith('\r')
+
+        # 直前の行がtqdmの行で、現在の行もそうであれば、前の行を更新する
+        if self.is_tqdm_line and (is_progress_bar or '\r' in text):
+            # Multilineウィジェットの最後の行を削除
+            current_value = self.multiline.get()
+            last_newline = current_value.rfind('\n')
+            if last_newline == -1:
+                new_value = ''
+            else:
+                new_value = current_value[:last_newline + 1]
+            self.multiline.update(value=new_value)
+
+        # 新しいテキストを書き込む
+        # '\r' を取り除き、末尾に改行を追加しない
+        cleaned_text = text.strip('\r')
+        self.multiline.print(cleaned_text, end='')
+
+        # 現在の行がtqdmの行だったか状態を保存
+        self.is_tqdm_line = is_progress_bar
+
+    def flush(self):
+        # print()関数が内部で呼び出す可能性があるため、このメソッドは必須
+        pass
+
+
 def load_config():
     """設定ファイルを読み込む。なければデフォルト値を返す."""
     if os.path.exists(CONFIG_FILE):
@@ -76,10 +114,14 @@ def main():
         [Text("アップロード対象フォルダ"), InputText(config.get("FOLDER_PATH", ""), key="FOLDER_PATH"), FolderBrowse("選択")],
         [Text("ダウンロード先フォルダ"), InputText(config.get("DOWNLOAD_FOLDER_PATH", ""), key="DOWNLOAD_FOLDER_PATH"), FolderBrowse("選択")],
         [Button("設定を保存"), Push(), Button("アップロード実行", key="UPLOAD"), Button("ダウンロード実行", key="DOWNLOAD")],
-        [Output(size=(80, 20), key='-OUTPUT-')] # 処理ログの出力エリア
+        [sg.Multiline(size=(80, 20), key='-OUTPUT-', disabled=True)] # autoscrollを削除
     ]
 
-    window = sg.Window("Notion Uploader/Downloader", layout)
+    # finalize=True にすることで、read()の前にウィジェットにアクセスできる
+    window = sg.Window("Notion Uploader/Downloader", layout, finalize=True)
+
+    # カスタム出力ストリームを作成
+    gui_output_stream = GuiOutputStream(window['-OUTPUT-'])
 
     while True:
         event, values = window.read()
@@ -92,9 +134,9 @@ def main():
             sg.popup("設定を保存しました。")
         
         if event in ("UPLOAD", "DOWNLOAD"):
-            # ログ出力をGUIのOutputウィジェットに切り替え
-            sys.stdout = window['-OUTPUT-']
-            sys.stderr = window['-OUTPUT-']
+            # ログ出力をGUIのカスタムストリームに切り替え
+            sys.stdout = gui_output_stream
+            sys.stderr = gui_output_stream
             window['-OUTPUT-'].update('') # 出力エリアをクリア
             
             # ボタンを無効化して多重実行を防止
