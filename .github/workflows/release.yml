@@ -36,8 +36,7 @@ jobs:
 
       # 4. PyInstallerで.exeファイルをビルド（クリーン・UPX無効化）
       - name: Build executable
-        run: |
-          pyinstaller --onefile --windowed --clean --noupx gui_main.py -n notion-tool
+        run: pyinstaller --onefile --windowed --name "Notion-File-Transfer" main.py
 
       # 5. リリースを更新し、EXEファイルとノートを添付
       - name: Update Release with EXE and Notes
