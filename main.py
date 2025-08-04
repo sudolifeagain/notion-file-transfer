@@ -51,15 +51,32 @@ def main():
     
     config = load_config()
 
+    # PySimpleGUIのバージョン互換性のための要素名
+    try:
+        Text = sg.Text
+        InputText = sg.InputText
+        Button = sg.Button
+        FolderBrowse = sg.FolderBrowse
+        Output = sg.Output
+        Push = sg.Push
+    except AttributeError:
+        # 新しいバージョンでの代替
+        Text = getattr(sg, 'T', getattr(sg, 'Text', sg.Text))
+        InputText = getattr(sg, 'I', getattr(sg, 'Input', sg.InputText))
+        Button = getattr(sg, 'B', getattr(sg, 'Btn', sg.Button))
+        FolderBrowse = getattr(sg, 'FolderBrowse', sg.FolderBrowse)
+        Output = getattr(sg, 'Output', sg.Output)
+        Push = getattr(sg, 'Push', lambda: sg.Text("", expand_x=True))
+
     # --- GUIのレイアウト定義 ---
     layout = [
-        [sg.Text("Notion 大容量ファイル転送ツール", font=("Helvetica", 16, "bold"))],
-        [sg.Text("Notion Token"), sg.InputText(config.get("NOTION_TOKEN", ""), key="NOTION_TOKEN", password_char='*')],
-        [sg.Text("Database ID "), sg.InputText(config.get("DATABASE_ID", ""), key="DATABASE_ID")],
-        [sg.Text("アップロード対象フォルダ"), sg.InputText(config.get("FOLDER_PATH", ""), key="FOLDER_PATH"), sg.FolderBrowse("選択")],
-        [sg.Text("ダウンロード先フォルダ"), sg.InputText(config.get("DOWNLOAD_FOLDER_PATH", ""), key="DOWNLOAD_FOLDER_PATH"), sg.FolderBrowse("選択")],
-        [sg.Button("設定を保存"), sg.Push(), sg.Button("アップロード実行", key="UPLOAD"), sg.Button("ダウンロード実行", key="DOWNLOAD")],
-        [sg.Output(size=(80, 20), key='-OUTPUT-')] # 処理ログの出力エリア
+        [Text("Notion 大容量ファイル転送ツール", font=("Helvetica", 16, "bold"))],
+        [Text("Notion Token"), InputText(config.get("NOTION_TOKEN", ""), key="NOTION_TOKEN", password_char='*')],
+        [Text("Database ID "), InputText(config.get("DATABASE_ID", ""), key="DATABASE_ID")],
+        [Text("アップロード対象フォルダ"), InputText(config.get("FOLDER_PATH", ""), key="FOLDER_PATH"), FolderBrowse("選択")],
+        [Text("ダウンロード先フォルダ"), InputText(config.get("DOWNLOAD_FOLDER_PATH", ""), key="DOWNLOAD_FOLDER_PATH"), FolderBrowse("選択")],
+        [Button("設定を保存"), Push(), Button("アップロード実行", key="UPLOAD"), Button("ダウンロード実行", key="DOWNLOAD")],
+        [Output(size=(80, 20), key='-OUTPUT-')] # 処理ログの出力エリア
     ]
 
     window = sg.Window("Notion Uploader/Downloader", layout)
