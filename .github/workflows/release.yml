@@ -22,19 +22,26 @@ jobs:
         with:
           python-version: '3.10'
 
-      # 3. 依存ライブラリをインストール
-      - name: Install dependencies
+      # 3. 依存関係インストール + PyInstallerブートローダー再構築
+      - name: Install dependencies and build PyInstaller from source
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install wheel
+          git clone https://github.com/pyinstaller/pyinstaller.git
+          cd pyinstaller/bootloader
+          python ./waf distclean all
+          cd ..
+          pip install .
 
-      # 4. PyInstallerで実行ファイルをビルド
-      - name: Build executable with PyInstaller
-        run: pyinstaller --onefile --windowed --name "Notion-File-Transfer" main.py
+      # 4. PyInstallerで.exeファイルをビルド（クリーン・UPX無効化）
+      - name: Build executable
+        run: |
+          pyinstaller --onefile --windowed --clean --noupx gui_main.py -n notion-tool
 
-      # 5. リリースを作成し、ビルドしたEXEファイルを添付
-      - name: Create Release and Upload Asset
-        uses: softprops/action-gh-release@v2
+      # 5. リリースを更新し、EXEファイルとノートを添付
+      - name: Update Release with EXE and Notes
+        uses: softprops/action-gh-release@v1
         with:
-          # `dist`フォルダ内のexeファイルをリリースに添付
-          files: dist/Notion-File-Transfer.exe
+          generate_release_notes: true
+          files: ./dist/notion-tool.exe
