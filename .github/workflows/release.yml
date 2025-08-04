@@ -44,7 +44,6 @@ jobs:
           pyinstaller --onefile --windowed `
             --name "Notion-File-Transfer" `
             --clean --noupx `
-            --icon=assets/app.ico `
             main.py
 
       # 6. リリース作成 & EXE添付
