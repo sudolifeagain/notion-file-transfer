@@ -47,7 +47,22 @@ jobs:
             --hidden-import PySimpleGUI `
             --hidden-import tkinter `
             --hidden-import tkinter.ttk `
+            --hidden-import requests `
+            --hidden-import json `
+            --hidden-import os `
+            --hidden-import sys `
+            --hidden-import threading `
+            --hidden-import math `
+            --hidden-import concurrent.futures `
+            --hidden-import shutil `
+            --hidden-import time `
+            --hidden-import re `
+            --hidden-import collections `
+            --hidden-import tqdm `
             --collect-all PySimpleGUI `
+            --collect-all tkinter `
+            --collect-all requests `
+            --collect-all tqdm `
             main.py
 
       # 6. リリース作成 & EXE添付
