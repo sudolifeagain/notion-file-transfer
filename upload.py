@@ -5,6 +5,7 @@ import concurrent.futures
 import shutil
 import sys
 import time
+from tqdm import tqdm
 
 # load_dotenv は不要なので削除
 
@@ -152,8 +153,6 @@ def main(config):
                 upload_id = upload_obj["id"]
                 upload_url = upload_obj["upload_url"]
 
-                chunk_start_time = time.time()
-
                 with open(filepath, "rb") as f:
                     f.seek(chunk_start)
                     with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
@@ -164,20 +163,11 @@ def main(config):
                             future = executor.submit(send_file_part, upload_url, part_bytes, part_num, NOTION_TOKEN, NOTION_VERSION)
                             futures.append(future)
 
-                        for i, future in enumerate(concurrent.futures.as_completed(futures), 1):
-                            future.result()
-                            percent = (i / num_parts) * 100
-                            bar_len = 30
-                            filled_len = int(bar_len * i // num_parts)
-                            bar = '█' * filled_len + '-' * (bar_len - filled_len)
-                            elapsed_time = time.time() - chunk_start_time
-                            avg_speed = ((i / num_parts) * chunk_size / 1024**2) / elapsed_time if elapsed_time > 0 else 0
-                            minutes, seconds = divmod(int(elapsed_time), 60)
-                            time_str = f"{minutes:02d}:{seconds:02d}"
-                            display_text = f"\r    - 送信中: [{bar}] {percent:.1f}% ({time_str}, {avg_speed:.2f} MB/s) "
-                            sys.stdout.write(display_text)
-                            sys.stdout.flush()
-                        print()
+                        # tqdm を使った進捗表示
+                        with tqdm(total=num_parts, desc="  - 送信中", unit="part", ncols=100) as pbar:
+                            for future in concurrent.futures.as_completed(futures):
+                                future.result()
+                                pbar.update(1)
 
                 print("  - 全パートの送信完了。アップロードを最終処理中...")
                 complete_file_upload(upload_id, NOTION_TOKEN, NOTION_VERSION)
