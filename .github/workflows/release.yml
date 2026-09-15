@@ -12,11 +12,11 @@ jobs:
     steps:
       # 1. ソースコード取得
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       # 2. Pythonセットアップ
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: '3.10'
 
@@ -67,7 +67,7 @@ jobs:
 
       # 6. リリース作成 & EXE添付
       - name: Update Release with EXE and Notes
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64  # v3.0.3
         with:
           generate_release_notes: true
           files: ./dist/Notion-File-Transfer.exe
